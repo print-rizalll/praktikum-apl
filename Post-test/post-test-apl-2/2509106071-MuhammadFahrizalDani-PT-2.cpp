@@ -361,12 +361,12 @@ int main() {
             cout << "  |       DAFTAR PENGGUNA TERDAFTAR          |\n";
             cout << "  +------------------------------------------+\n";
 
-            cout << "\n+" << string(5,'-') << "+" << string(25,'-') << "+" << string(20,'-') << "+\n";
-            cout << "| " << left << setw(3) << "No" << " | " << setw(23) << "Nama" << " | " << setw(18) << "Password" << " |\n";
-            cout << "+" << string(5,'-') << "+" << string(25,'-') << "+" << string(20,'-') << "+\n";
+            cout << "\n+" << string(5,'-') << "+" << string(25,'-') << "+\n";
+            cout << "| " << left << setw(3) << "No" << " | " << setw(23) << "Nama" << " |\n";
+            cout << "+" << string(5,'-') << "+" << string(25,'-') << "+\n";
             for (int i = 0; i < jumlahUser; i++)
-                cout << "| " << left << setw(3) << (i+1) << " | " << setw(23) << daftarUser[i].nama << " | " << setw(18) << daftarUser[i].password << " |\n";
-            cout << "+" << string(5,'-') << "+" << string(25,'-') << "+" << string(20,'-') << "+\n";
+                cout << "| " << left << setw(3) << (i+1) << " | " << setw(23) << daftarUser[i].nama << " |\n";
+            cout << "+" << string(5,'-') << "+" << string(25,'-') << "+\n";
             cout << "  Total: " << jumlahUser << " pengguna\n";
 
             cout << "  Tekan Enter untuk kembali..."; cin.get();
