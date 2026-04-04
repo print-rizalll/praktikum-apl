@@ -24,14 +24,14 @@ struct Pengguna {
     bool   aktif;
 };
 
-void tampilBanner(string userAktif) {
+void tampilBanner(Pengguna *pUser) {
     cout << "\n";
     cout << "  +=================================================+\n";
     cout << "  |    >>>  MANAJEMEN ARMADA PESAWAT  <<<           |\n";
     cout << "  |      Sistem Informasi Pengelolaan Pesawat       |\n";
     cout << "  +=================================================+\n";
-    if (userAktif != "")
-        cout << "  | Login sebagai : " << left << setw(33) << userAktif << "|\n"
+    if (pUser != nullptr && (*pUser).aktif)
+        cout << "  | Login sebagai : " << left << setw(33) << (*pUser).nama << "|\n"
             << "  +=================================================+\n";
     cout << "\n";
 }
@@ -41,14 +41,10 @@ void tampilTabelPesawat(Pesawat daftarPesawat[], int jumlahPesawat) {
         << string(18,'-') << "+" << string(14,'-') << "+" << string(8,'-') << "+"
         << string(12,'-') << "+" << string(26,'-') << "+\n";
     cout << "| " << left
-        << setw(3)  << "ID"       << " | "
-        << setw(8)  << "Kode"     << " | "
-        << setw(18) << "Maskapai" << " | "
-        << setw(16) << "Model"    << " | "
-        << setw(12) << "Status"   << " | "
-        << setw(6)  << "Tahun"    << " | "
-        << setw(10) << "Kap."     << " | "
-        << setw(24) << "Kelas"    << " |\n";
+        << setw(3)  << "ID"       << " | " << setw(8)  << "Kode"     << " | "
+        << setw(18) << "Maskapai" << " | " << setw(16) << "Model"    << " | "
+        << setw(12) << "Status"   << " | " << setw(6)  << "Tahun"    << " | "
+        << setw(10) << "Kap."     << " | " << setw(24) << "Kelas"    << " |\n";
     cout << "+" << string(5,'-') << "+" << string(10,'-') << "+" << string(20,'-') << "+"
         << string(18,'-') << "+" << string(14,'-') << "+" << string(8,'-') << "+"
         << string(12,'-') << "+" << string(26,'-') << "+\n";
@@ -80,14 +76,13 @@ void tampilTabelPesawat(Pesawat daftarPesawat[], int jumlahPesawat, bool ringkas
     cout << "+" << string(5,'-') << "+" << string(10,'-') << "+" << string(20,'-') << "+" << string(18,'-') << "+" << string(14,'-') << "+\n";
 }
 
-bool statusValid(string status) {
-    if (status == "Aktif" || status == "Perawatan" || status == "Tidak Aktif")
+bool statusValid(string *status) {
+    if (*status == "Aktif" || *status == "Perawatan" || *status == "Tidak Aktif")
         return true;
-    else
-        return false;
+    return false;
 }
 
-int cariIndexPesawat(Pesawat daftarPesawat[], int jumlahPesawat, int idCari) {
+int cariIndexPesawat(Pesawat daftarPesawat[], int jumlahPesawat, int &idCari) {
     for (int i = 0; i < jumlahPesawat; i++)
         if (daftarPesawat[i].id == idCari) return i;
     return -1;
@@ -126,10 +121,9 @@ bool registerUser(Pengguna daftarUser[], int &jumlahUser, int MAX_USER) {
     return true;
 }
 
-string loginUser(Pengguna daftarUser[], int jumlahUser) {
-    int  percobaan     = 0;
+Pengguna* loginUser(Pengguna daftarUser[], int &jumlahUser) {
+    int  percobaan = 0;
     bool loginBerhasil = false;
-    string namaLogin   = "";
 
     while (percobaan < 3 && !loginBerhasil) {
         string inputNama, inputPass;
@@ -140,14 +134,15 @@ string loginUser(Pengguna daftarUser[], int jumlahUser) {
         cout << "  Password : "; getline(cin, inputPass);
 
         for (int i = 0; i < jumlahUser; i++) {
-            if (daftarUser[i].nama == inputNama &&
-                daftarUser[i].password == inputPass &&
+            if (daftarUser[i].nama     == inputNama &&
+                daftarUser[i].password == inputPass  &&
                 daftarUser[i].aktif) {
                 loginBerhasil = true;
-                namaLogin     = inputNama;
-                break;
+
+                return &daftarUser[i];
             }
         }
+
         if (!loginBerhasil) {
             percobaan++;
             if (percobaan < 3)
@@ -160,7 +155,7 @@ string loginUser(Pengguna daftarUser[], int jumlahUser) {
             }
         }
     }
-    return namaLogin;
+    return nullptr;
 }
 
 void tambahPesawat(Pesawat daftarPesawat[], int &jumlahPesawat, int &idCounter, int MAX_PESAWAT) {
@@ -168,10 +163,7 @@ void tambahPesawat(Pesawat daftarPesawat[], int &jumlahPesawat, int &idCounter, 
     cout << "  |       TAMBAH DATA PESAWAT                |\n";
     cout << "  +------------------------------------------+\n";
 
-    if (jumlahPesawat >= MAX_PESAWAT) {
-        cout << "  [!] Data penuh!\n";
-        return;
-    }
+    if (jumlahPesawat >= MAX_PESAWAT) { cout << "  [!] Data penuh!\n"; return; }
 
     Pesawat baru;
     baru.id = idCounter++;
@@ -182,7 +174,8 @@ void tambahPesawat(Pesawat daftarPesawat[], int &jumlahPesawat, int &idCounter, 
 
     while (true) {
         cout << "  Status (Aktif/Perawatan/Tidak Aktif) : "; getline(cin, baru.status);
-        if (statusValid(baru.status)) break;
+        string *pStatus = &baru.status;
+        if (statusValid(pStatus)) break;
         else cout << "  [!] Status tidak valid! Pilihan: Aktif, Perawatan, Tidak Aktif\n";
     }
 
@@ -200,10 +193,7 @@ void lihatPesawat(Pesawat daftarPesawat[], int jumlahPesawat) {
     cout << "\n  +------------------------------------------+\n";
     cout << "  |       DAFTAR ARMADA PESAWAT              |\n";
     cout << "  +------------------------------------------+\n";
-    if (jumlahPesawat == 0) {
-        cout << "  [!] Belum ada data pesawat.\n";
-        return;
-    }
+    if (jumlahPesawat == 0) { cout << "  [!] Belum ada data pesawat.\n"; return; }
     tampilTabelPesawat(daftarPesawat, jumlahPesawat);
     cout << "  Total kapasitas seluruh armada: "
         << totalKapasitas(daftarPesawat, 0, jumlahPesawat) << " penumpang\n";
@@ -223,34 +213,37 @@ void ubahPesawat(Pesawat daftarPesawat[], int jumlahPesawat) {
     int idx = cariIndexPesawat(daftarPesawat, jumlahPesawat, idCari);
     if (idx == -1) { cout << "\n  [!] ID tidak ditemukan.\n"; return; }
 
+    Pesawat *pPesawat = &daftarPesawat[idx];
+
     cout << "\n  Masukkan data baru (Enter = lewati):\n\n";
     string inp;
 
-    cout << "  Kode Pesawat [" << daftarPesawat[idx].kode_pesawat << "]: ";
-    getline(cin, inp); if (!inp.empty()) daftarPesawat[idx].kode_pesawat = inp;
+    cout << "  Kode Pesawat [" << pPesawat->kode_pesawat << "]: ";
+    getline(cin, inp); if (!inp.empty()) pPesawat->kode_pesawat = inp;
 
-    cout << "  Nama Maskapai [" << daftarPesawat[idx].nama_maskapai << "]: ";
-    getline(cin, inp); if (!inp.empty()) daftarPesawat[idx].nama_maskapai = inp;
+    cout << "  Nama Maskapai [" << pPesawat->nama_maskapai << "]: ";
+    getline(cin, inp); if (!inp.empty()) pPesawat->nama_maskapai = inp;
 
-    cout << "  Model [" << daftarPesawat[idx].model << "]: ";
-    getline(cin, inp); if (!inp.empty()) daftarPesawat[idx].model = inp;
+    cout << "  Model [" << pPesawat->model << "]: ";
+    getline(cin, inp); if (!inp.empty()) pPesawat->model = inp;
 
     while (true) {
-        cout << "  Status [" << daftarPesawat[idx].status << "] (Aktif/Perawatan/Tidak Aktif, Enter=lewati): ";
+        cout << "  Status [" << pPesawat->status << "] (Aktif/Perawatan/Tidak Aktif, Enter=lewati): ";
         getline(cin, inp);
         if (inp.empty()) break;
-        if (statusValid(inp)) { daftarPesawat[idx].status = inp; break; }
+        string *pStatus = &inp;
+        if (statusValid(pStatus)) { pPesawat->status = inp; break; }
         else cout << "  [!] Status tidak valid! Pilihan: Aktif, Perawatan, Tidak Aktif\n";
     }
 
-    cout << "  Tahun Produksi [" << daftarPesawat[idx].tahun_produksi << "]: ";
-    getline(cin, inp); if (!inp.empty()) daftarPesawat[idx].tahun_produksi = inp;
+    cout << "  Tahun Produksi [" << pPesawat->tahun_produksi << "]: ";
+    getline(cin, inp); if (!inp.empty()) pPesawat->tahun_produksi = inp;
 
-    cout << "  Kapasitas Penumpang [" << daftarPesawat[idx].spek.kapasitas_penumpang << "]: ";
-    getline(cin, inp); if (!inp.empty()) daftarPesawat[idx].spek.kapasitas_penumpang = stoi(inp);
+    cout << "  Kapasitas Penumpang [" << pPesawat->spek.kapasitas_penumpang << "]: ";
+    getline(cin, inp); if (!inp.empty()) pPesawat->spek.kapasitas_penumpang = stoi(inp);
 
-    cout << "  Kelas Penerbangan [" << daftarPesawat[idx].spek.kelas_penerbangan << "]: ";
-    getline(cin, inp); if (!inp.empty()) daftarPesawat[idx].spek.kelas_penerbangan = inp;
+    cout << "  Kelas Penerbangan [" << pPesawat->spek.kelas_penerbangan << "]: ";
+    getline(cin, inp); if (!inp.empty()) pPesawat->spek.kelas_penerbangan = inp;
 
     cout << "\n  [OK] Data ID " << idCari << " berhasil diperbarui.\n";
 }
@@ -269,9 +262,10 @@ void hapusPesawat(Pesawat daftarPesawat[], int &jumlahPesawat) {
     int idx = cariIndexPesawat(daftarPesawat, jumlahPesawat, idCari);
     if (idx == -1) { cout << "\n  [!] ID tidak ditemukan.\n"; return; }
 
-    cout << "\n  Akan dihapus: [" << daftarPesawat[idx].kode_pesawat
-        << "] " << daftarPesawat[idx].nama_maskapai
-        << " - " << daftarPesawat[idx].model << "\n";
+    Pesawat *pPesawat = &daftarPesawat[idx];
+    cout << "\n  Akan dihapus: [" << pPesawat->kode_pesawat
+        << "] " << pPesawat->nama_maskapai
+        << " - "  << pPesawat->model << "\n";
 
     string kf;
     cout << "  Yakin hapus? (y/n): "; getline(cin, kf);
@@ -285,18 +279,18 @@ void hapusPesawat(Pesawat daftarPesawat[], int &jumlahPesawat) {
     }
 }
 
-void lihatUser(Pengguna daftarUser[], int jumlahUser) {
+void lihatUser(Pengguna daftarUser[], int *jumlahUser) {
     cout << "\n  +------------------------------------------+\n";
     cout << "  |       DAFTAR PENGGUNA TERDAFTAR          |\n";
     cout << "  +------------------------------------------+\n";
     cout << "\n+" << string(5,'-') << "+" << string(25,'-') << "+" << string(20,'-') << "+\n";
     cout << "| " << left << setw(3) << "No" << " | " << setw(23) << "Nama" << " | " << setw(18) << "Password" << " |\n";
     cout << "+" << string(5,'-') << "+" << string(25,'-') << "+" << string(20,'-') << "+\n";
-    for (int i = 0; i < jumlahUser; i++)
+    for (int i = 0; i < *jumlahUser; i++)
         cout << "| " << left << setw(3) << (i+1) << " | " << setw(23) << daftarUser[i].nama
             << " | " << setw(18) << daftarUser[i].password << " |\n";
     cout << "+" << string(5,'-') << "+" << string(25,'-') << "+" << string(20,'-') << "+\n";
-    cout << "  Total: " << jumlahUser << " pengguna\n";
+    cout << "  Total: " << *jumlahUser << " pengguna\n";
 }
 
 int main() {
@@ -314,7 +308,6 @@ int main() {
     daftarUser[0] = {"rizal", "071", true};
     jumlahUser = 1;
 
-
     daftarPesawat[0] = {idCounter++, "GA-001", "Garuda Indonesia", "Boeing 737-800",   "Aktif",       "2015", {162, "Ekonomi & Bisnis"}};
     daftarPesawat[1] = {idCounter++, "JT-045", "Lion Air",         "Boeing 737 MAX 8", "Aktif",       "2019", {210, "Ekonomi"}};
     daftarPesawat[2] = {idCounter++, "QZ-102", "AirAsia",          "Airbus A320neo",   "Perawatan",   "2018", {186, "Ekonomi"}};
@@ -322,15 +315,19 @@ int main() {
     daftarPesawat[4] = {idCounter++, "ID-201", "Batik Air",        "Airbus A330-300",  "Aktif",       "2020", {440, "Ekonomi & Bisnis & First"}};
     jumlahPesawat = 5;
 
+    Pengguna *userLogin = nullptr;
+
     bool programBerjalan = true;
 
     while (programBerjalan) {
 
-        string userAktif = "";
+        userLogin = nullptr;
 
         bool sudahLogin = false;
         while (!sudahLogin) {
-            tampilBanner("");
+            Pengguna kosong = {"", "", false};
+            tampilBanner(&kosong);
+
             cout << "  +-----------------------------+\n";
             cout << "  |        MENU AWAL            |\n";
             cout << "  |  1. Login                   |\n";
@@ -343,9 +340,10 @@ int main() {
             cin >> pilihanAwal; cin.ignore();
 
             if (pilihanAwal == 1) {
-                userAktif = loginUser(daftarUser, jumlahUser);
-                if (userAktif != "") {
-                    cout << "\n  [OK] Login berhasil! Selamat datang, " << userAktif << "\n";
+                userLogin = loginUser(daftarUser, jumlahUser);
+                if (userLogin != nullptr) {
+                    cout << "\n  [OK] Login berhasil! Selamat datang, "
+                        << userLogin->nama << "\n";
                     cout << "  Tekan Enter untuk melanjutkan..."; cin.get();
                     sudahLogin = true;
                 }
@@ -365,7 +363,8 @@ int main() {
         int  pilihan = 0;
 
         while (jalan) {
-            tampilBanner(userAktif);
+            tampilBanner(userLogin);
+
             cout << "  +------------------------------------------+\n";
             cout << "  |            MENU UTAMA                    |\n";
             cout << "  +------------------------------------------+\n";
@@ -383,9 +382,10 @@ int main() {
             else if (pilihan == 2) { lihatPesawat(daftarPesawat, jumlahPesawat); }
             else if (pilihan == 3) { ubahPesawat(daftarPesawat, jumlahPesawat); }
             else if (pilihan == 4) { hapusPesawat(daftarPesawat, jumlahPesawat); }
-            else if (pilihan == 5) { lihatUser(daftarUser, jumlahUser); }
+            else if (pilihan == 5) { lihatUser(daftarUser, &jumlahUser); }  // Address-of &
             else if (pilihan == 0) {
                 cout << "\n  [OK] Logout berhasil. Kembali ke menu login...\n";
+                userLogin = nullptr;
                 jalan = false;
             } else {
                 cout << "\n  [!] Pilihan tidak valid.\n";
@@ -395,7 +395,6 @@ int main() {
                 cout << "  Tekan Enter untuk kembali..."; cin.get();
             }
         }
-
     }
     return 0;
 }
