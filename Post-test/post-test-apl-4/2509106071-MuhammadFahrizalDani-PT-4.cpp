@@ -1,4 +1,4 @@
-#include <iostream>
+                                                                                                                                                                                            #include <iostream>
 #include <iomanip>
 #include <string>
 using namespace std;
@@ -382,7 +382,7 @@ int main() {
             else if (pilihan == 2) { lihatPesawat(daftarPesawat, jumlahPesawat); }
             else if (pilihan == 3) { ubahPesawat(daftarPesawat, jumlahPesawat); }
             else if (pilihan == 4) { hapusPesawat(daftarPesawat, jumlahPesawat); }
-            else if (pilihan == 5) { lihatUser(daftarUser, &jumlahUser); }  // Address-of &
+            else if (pilihan == 5) { lihatUser(daftarUser, &jumlahUser); }
             else if (pilihan == 0) {
                 cout << "\n  [OK] Logout berhasil. Kembali ke menu login...\n";
                 userLogin = nullptr;
