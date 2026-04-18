@@ -149,7 +149,7 @@ void binarySearchID(Pesawat daftarPesawat[], int jumlahPesawat, int *idCari) {
 void linearSearchNama(Pesawat daftarPesawat[], int jumlahPesawat, string *kataCari) {
 
     cout << "\n  +------------------------------------------+\n";
-    cout << "  |  SEARCHING: Linear Search Nama       |\n";
+    cout << "  |  SEARCHING: Linear Search Nama Maskapai  |\n";
     cout << "  +------------------------------------------+\n";
 
     string kataLow = *kataCari;
@@ -209,7 +209,7 @@ void menuSearching(Pesawat daftarPesawat[], int &jumlahPesawat) {
         cout << "  |           MENU SEARCHING                 |\n";
         cout << "  +------------------------------------------+\n";
         cout << "  |  1. Binary Search     - Cari by ID       |\n";
-        cout << "  |  2. Linear Search - Cari by Nama     |\n";
+        cout << "  |  2. Linear Search - Cari by Nama Maskapai|\n";
         cout << "  |  0. Kembali                              |\n";
         cout << "  +------------------------------------------+\n";
         cout << "  Pilihan: ";
